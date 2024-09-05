@@ -1,0 +1,13 @@
+.vscode/
+Library/
+Logs/
+Packages/
+Temp/
+*.sln
+*.csproj
+*.sln
+*.userprefs
+*.unityproj
+*.DS_Store
+Assets/Gril_GreatSword_AnimSet/
+Assets/Gril_GreatSword_AnimSet.meta
