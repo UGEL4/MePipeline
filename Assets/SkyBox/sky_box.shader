@@ -44,7 +44,7 @@ Shader "MePipeline/sky_box"
             {
                 float3 viewDir = normalize(i.worldPos - _WorldSpaceCameraPos);
                 return _SkyBoxTexture.Sample(sampler_SkyBoxTexture, viewDir);
-                //return float4(1,0,0,1);
+                //return float4(_Corner[3].x,_Corner[3].y,0,1);
             }
             ENDCG
         }
