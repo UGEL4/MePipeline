@@ -50,7 +50,7 @@ public class Test : MonoBehaviour
         Graphics.SetRenderTarget(rt);
         GL.Clear(true, true, Color.grey);
         //start drawcall
-        cubeMaterial.color = new Color(0, 0, 1, 1);
+        //cubeMaterial.color = new Color(0, 0, 1, 1);
         cubeMaterial.SetPass(0);
         Graphics.DrawMeshNow(cubeMesh, cubeTrans.localToWorldMatrix);
         DrawSkyBox(cam);

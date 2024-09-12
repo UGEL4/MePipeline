@@ -180,7 +180,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 822e72347ffa0bd448c197eb30319d2e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -426,5 +426,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cubeTrans: {fileID: 574970269}
   cubeMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  cubeMaterial: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  cubeMaterial: {fileID: 2100000, guid: 822e72347ffa0bd448c197eb30319d2e, type: 2}
   skyBoxMaterial: {fileID: 2100000, guid: 0186cbf9125f09c42a1f7f914842645e, type: 2}
