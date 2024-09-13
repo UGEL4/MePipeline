@@ -23,7 +23,7 @@ Shader "MePipeline/draw_box"
         struct Input
         {
             float2 uv_MainTex;
-            float2 uv_Normal;
+            //float2 uv_Normal;
         };
 
         half _Glossiness;
@@ -41,7 +41,7 @@ Shader "MePipeline/draw_box"
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex);
             o.Albedo = c.rgb;
-            o.Normal = UnpackNormal(tex2D(sampler_NormalTex, IN.uv_Normal));
+            o.Normal = UnpackNormal(tex2D(sampler_NormalTex, IN.uv_MainTex));
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
