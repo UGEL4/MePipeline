@@ -4,50 +4,83 @@ Shader "MePipeline/draw_box"
     {
         //_Color ("Color", Color) = (0,0,0,1)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _NormalTex ("Normal", 2D) = "white" {}
+        _NormalTex ("Normal", 2D) = "bump" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
     }
     SubShader
     {
+        pass
+        {
+            Tags{"LightMode" = "ForwardBase"}
         CGPROGRAM
+        #include "Lighting.cginc"
+        #include "UnityCG.cginc"
         // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Standard
+        #pragma vertex vert
+        #pragma fragment frag
 
         // Use shader model 3.0 target, to get nicer looking lighting
         //#pragma target 3.0
 
+        //fixed4 _Color;
         sampler2D _MainTex;
         sampler2D sampler_NormalTex;
-
-        struct Input
-        {
-            float2 uv_MainTex;
-            //float2 uv_Normal;
-        };
 
         half _Glossiness;
         half _Metallic;
 
-        // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
-        // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
-        // #pragma instancing_options assumeuniformscaling
-        //UNITY_INSTANCING_BUFFER_START(Props)
-            // put more per-instance properties here
-        //UNITY_INSTANCING_BUFFER_END(Props)
-
-        void surf (Input IN, inout SurfaceOutputStandard o)
+        struct appdata
         {
-            // Albedo comes from a texture tinted by color
-            fixed4 c = tex2D (_MainTex, IN.uv_MainTex);
-            o.Albedo = c.rgb;
-            o.Normal = UnpackNormal(tex2D(sampler_NormalTex, IN.uv_MainTex));
-            // Metallic and smoothness come from slider variables
-            o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
-            o.Alpha = c.a;
+            float4 vertex : POSITION;
+            float3 normal : NORMAL;
+            float4 tangent : TANGENT;
+            float4 uv : TEXCOORD0;
+        };
+
+        struct v2f
+        {
+            float4 pos : SV_POSITION;
+            float4 uv : TEXCOORD0;
+            float3 lightDir : TEXCOORD1;
+            float3 viewDir : TEXCOORD2;
+        };
+
+        v2f vert(appdata v)
+        {
+            v2f o;
+            o.pos = UnityObjectToClipPos(v.vertex);
+            o.uv.xy = v.uv.xy;
+            o.uv.zw = v.uv.xy;
+
+            //副切线
+            float3 binormal = cross(normalize(v.normal), normalize(v.tangent.xyz)) * v.tangent.w;
+            float3x3 rotation = float3x3(v.tangent.xyz, binormal, v.normal);
+
+            o.lightDir = mul(rotation, ObjSpaceLightDir(v.vertex));
+            o.viewDir  = mul(rotation, ObjSpaceViewDir(v.vertex));
+
+            return o;
+        }
+
+        fixed4 frag(v2f i) : SV_Target
+        {
+            float3 tangentLightDir = normalize(i.lightDir);
+            float3 tangentViewDir  = normalize(i.viewDir);
+
+            float4 packedNormal = tex2D(sampler_NormalTex, i.uv.zw);
+            float3 tangentNormal = UnpackNormal(packedNormal);
+            tangentNormal.z = sqrt(1.0 - saturate(dot(tangentNormal.xy, tangentNormal.xy)));
+
+            float3 albedo = tex2D(_MainTex, i.uv).rgb;
+            float3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
+            float3 diffuse = float3(1, 1, 1) * albedo * max(0, dot(tangentNormal, tangentLightDir));
+            //float halfDir = normalize(tangentViewDir + tangentLightDir);
+
+            return fixed4(ambient + diffuse, 1.0);
         }
         ENDCG
+        }
     }
-    //FallBack "Diffuse"
+    FallBack "Diffuse"
 }
